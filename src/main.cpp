@@ -2,7 +2,6 @@
 #include <vector>
 #include <array>
 #include <time.h>
-#include <iostream>
 #include <cmath>
 
 
@@ -110,8 +109,6 @@ int main()
         }
         window.display();
     }
-
-    std::cout << point_pos.size() << '\n';
 
     return 0;
 }
