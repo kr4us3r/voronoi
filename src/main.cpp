@@ -3,6 +3,8 @@
 #include <array>
 #include <time.h>
 #include <iostream>
+#include <cmath>
+
 
 int main()
 {
@@ -12,9 +14,10 @@ int main()
     // set fixed point size
     constexpr int point_size = 5;
 
-    /*  create 50 random colors in advance to
+    /*  create num_colors random colors in advance to
         save resources during diagram's generation */
-    std::array<sf::Color, 50> colors;
+    constexpr size_t num_colors = 50;
+    std::array<sf::Color, num_colors> colors;
     std::srand(time(nullptr));
     for (size_t i = 0; i < 50; ++i) {
         colors[i] = sf::Color(std::rand() % 256,
@@ -29,6 +32,13 @@ int main()
     // initialize window with a custome style to prevent resize and fullscreen
     sf::RenderWindow window(sf::VideoMode(width, height), "voronoi",
                             sf::Style::Titlebar | sf::Style::Close);
+
+    sf::Sprite background;
+    sf::Texture texture;
+    sf::Image img;
+    img.create(width, height, sf::Color::Black);
+    texture.loadFromImage(img);
+    background.setTexture(texture);
 
     while (window.isOpen())
     {
@@ -59,7 +69,24 @@ int main()
 
             if (event.type == sf::Event::KeyPressed) {
                 if (event.key.code == sf::Keyboard::Space) {
-                    // to do
+                    int num_cells = point_pos.size();
+
+                    for (int y = 0; y < height; ++y) {
+                        for (int x = 0; x < width; ++x) {
+                            int d_min = INT32_MAX;
+                            int j = 0;
+                            for (size_t i = 0; i < num_cells; ++i) {
+                                int d = std::pow(point_pos[i].x - x, 2) + std::pow(point_pos[i].y - y, 2);
+                                if (d < d_min) {
+                                    d_min = d;
+                                    j = i;
+                                }
+                            }
+                            img.setPixel(x, y, colors[j % num_colors]);
+                        }
+                    }
+                    texture.loadFromImage(img);
+                    background.setTexture(texture);
                 }
             }
 
@@ -68,11 +95,16 @@ int main()
                     // remove all points and their stored positions
                     circles.clear();
                     point_pos.clear();
+                    // reset background
+                    img.create(width, height, sf::Color::Black);
+                    texture.loadFromImage(img);
+                    background.setTexture(texture);
                 }
             }
         }
 
         window.clear();
+        window.draw(background);
         for (size_t i = 0; i < circles.size(); ++i) {
             window.draw(circles[i]);
         }
