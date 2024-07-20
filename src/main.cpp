@@ -3,6 +3,7 @@
 #include <array>
 #include <time.h>
 #include <cmath>
+#include <unordered_set>
 
 
 int main()
@@ -15,13 +16,13 @@ int main()
 
     /*  create num_colors random colors in advance to
         save resources during diagram's generation */
-    constexpr size_t num_colors = 50;
+    constexpr size_t num_colors = 128;
     std::array<sf::Color, num_colors> colors;
     std::srand(time(nullptr));
-    for (size_t i = 0; i < 50; ++i) {
+    for (size_t i = 0; i < num_colors; ++i) {
         colors[i] = sf::Color(std::rand() % 256,
-                              std::rand() % 256,
-                              std::rand() % 256);
+                                    std::rand() % 256,
+                                    std::rand() % 256);
     }
     
     // create vectors to store points and their positions
@@ -51,7 +52,7 @@ int main()
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     // read and store mouse click position
                     sf::Vector2i mouse_pos = sf::Vector2i(event.mouseButton.x,
-                                                        event.mouseButton.y);
+                                                          event.mouseButton.y);
                     for (size_t i = 0; i < point_pos.size(); ++i) {
                         if (point_pos[i] == mouse_pos) {
                             continue;
