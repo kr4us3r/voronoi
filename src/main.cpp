@@ -3,6 +3,7 @@
 #include <array>
 #include <time.h>
 #include <cmath>
+#include <algorithm>
 
 
 int main()
@@ -54,16 +55,12 @@ int main()
                                                           event.mouseButton.y);
                     size_t size = point_pos.size();
 
-                    bool should_continue = false;
-                    for (size_t i = 0; i < size; ++i) {
-                        if (point_pos[i] == mouse_pos) {
-                            should_continue = true;
-                            break;
-                        }
-                    }
-                    if (should_continue) {
+                    auto search = std::find_if(point_pos.begin(), point_pos.end(),
+                        [&](const sf::Vector2i v) {
+                            return v == mouse_pos;
+                    });
+                    if (search != std::end(point_pos))
                         continue;
-                    }
 
                     point_pos.push_back(mouse_pos);
 
