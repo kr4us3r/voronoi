@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <array>
-#include <time.h>
+#include <ctime>
 #include <cmath>
 #include <algorithm>
 
