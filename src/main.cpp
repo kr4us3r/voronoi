@@ -18,7 +18,7 @@ int main()
         save resources during diagram's generation */
     constexpr size_t num_colors = 128;
     std::array<sf::Color, num_colors> colors;
-    std::srand(time(nullptr));
+    std::srand(std::time(nullptr));
     for (size_t i = 0; i < num_colors; ++i) {
         colors[i] = sf::Color(std::rand() % 256,
                               std::rand() % 256,
@@ -55,8 +55,10 @@ int main()
                                                           event.mouseButton.y);
                     size_t size = point_pos.size();
 
+                    /* find if such a position is already present in the array
+                    to prevent multiple circles at identic positions */
                     auto search = std::find_if(point_pos.begin(), point_pos.end(),
-                        [&](const sf::Vector2i v) {
+                        [=](const sf::Vector2i v) {
                             return v == mouse_pos;
                     });
                     if (search != std::end(point_pos))
