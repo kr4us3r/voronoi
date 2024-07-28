@@ -1,10 +1,4 @@
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <array>
-#include <ctime>
-#include <cmath>
-#include <algorithm>
-#include <game.hpp>
+#include <game.h>
 
 
 int main()

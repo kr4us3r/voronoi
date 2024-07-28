@@ -1,4 +1,4 @@
-#include <game.hpp>
+#include <game.h>
 #include <ctime>
 #include <cmath>
 #include <algorithm>
@@ -22,7 +22,7 @@ void Game::setBlackBackground() {
     background.setTexture(texture);
 }
 
-void Game::draw() {
+void Game::render() {
     window.draw(background);
     for (size_t i = 0; i < circles.size(); ++i) {
         window.draw(circles[i]);
@@ -108,7 +108,7 @@ void Game::run() {
             }
         }
         window.clear();
-        draw();
+        render();
         window.display();
     }
 }

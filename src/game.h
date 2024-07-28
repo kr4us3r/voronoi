@@ -28,7 +28,7 @@ class Game {
     sf::Image img;
 
     void setBlackBackground();
-    void draw();
+    void render();
     void createPoint(sf::Event&);
     void generateVoronoi();
     void reset();
