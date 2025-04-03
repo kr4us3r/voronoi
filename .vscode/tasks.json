@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build SFML Dynamic",
+            "type": "shell",
+            "command": "C:/Programming/VSCode Projects/C++/MinGW-SFML/bin/g++.exe",
+            "args": [
+                "main.cpp",
+                "-I", "C:/Programming/VSCode Projects/C++/SFML/include",
+                "-I", "${workspaceFolder}",
+                "-L", "C:/Programming/VSCode Projects/C++/SFML/lib",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system",
+                "-o", "game.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Build SFML Static",
+            "type": "shell",
+            "command": "C:/Programming/VSCode Projects/C++/MinGW-SFML/bin/g++.exe",
+            "args": [
+                "*.cpp",
+                "-static",
+                "-DSFML_STATIC",
+                "-I", "C:/Programming/VSCode Projects/C++/SFML/include",
+                "-I", "${workspaceFolder}",
+                "-L", "C:/Programming/VSCode Projects/C++/SFML/lib",
+                "-lsfml-graphics-s",
+                "-lsfml-window-s",
+                "-lsfml-system-s",
+                "-lopengl32",
+                "-lwinmm",
+                "-lgdi32",
+                "-o", "game.exe"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+    ]
+}
