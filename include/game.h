@@ -9,25 +9,22 @@
 
 class Game {
     // set fixed window width and height
-    const unsigned width = 800;
-    const unsigned height = 600;
+    const unsigned width = 1024u;
+    const unsigned height = 768u;
     // set fixed point size
-    const int point_size = 5;
+    const int point_size = 4;
 
-    /*  number of colors to create in advance to
-        save resources during diagram's generation */
-    static const size_t num_colors = 128;
+    // number of colors to create in advance
+    static constexpr std::size_t num_colors = 256;
+    // vectors to store colors and points positions
     std::array<sf::Color, num_colors> colors;
-
-    // create vectors to store points and their positions
-    std::vector<sf::CircleShape> circles;
     std::vector<sf::Vector2i> point_pos;
 
     sf::RenderWindow window;
-
-    sf::Texture texture{sf::Vector2u({width, height})};
-    sf::Sprite background{texture};
-    sf::Image img{{width, height}, sf::Color::Black};
+    sf::Image img;
+    sf::Texture texture;
+    sf::Sprite background;
+    sf::CircleShape circle;
 
     void setBlackBackground();
     void render();
