@@ -1,7 +1,8 @@
 #include <game.h>
 #include <ctime>
-#include <algorithm>
 #include <limits>
+#include <thread>
+#include <vector>
 
 Game::Game() : window(sf::VideoMode({width, height}), "voronoi",
                       sf::Style::Titlebar | sf::Style::Close),
@@ -19,6 +20,7 @@ Game::Game() : window(sf::VideoMode({width, height}), "voronoi",
     circle.setRadius(static_cast<float>(point_size));
     circle.setFillColor(sf::Color::Red);
     point_pos.reserve(num_colors);
+    point_set.reserve(num_colors);
 }
 
 void Game::setBlackBackground() {
@@ -43,7 +45,7 @@ void Game::render() {
 
 void Game::createPoint(sf::Vector2i position) {
     // prevent duplicates
-    if (std::find(point_pos.begin(), point_pos.end(), position) != point_pos.end())
+    if (!point_set.insert(position).second)
         return;
 
     point_pos.push_back(position);
@@ -54,23 +56,49 @@ void Game::generateVoronoi() {
     if (num_cells == 0 || num_cells > num_colors)
         return;
 
-    for (unsigned y = 0; y < height; ++y) {
-        for (unsigned x = 0; x < width; ++x) {
-            unsigned dist_min = std::numeric_limits<unsigned>::max();
-            std::size_t j = 0;
+    unsigned num_threads = std::thread::hardware_concurrency();
+    if (num_threads == 0) num_threads = 4;
 
-            for (std::size_t i = 0; i < num_cells; ++i) {
-                int diff_x = point_pos[i].x - x;
-                int diff_y = point_pos[i].y - y;
-                unsigned dist = diff_x * diff_x + diff_y * diff_y;
-                if (dist < dist_min) {
-                    dist_min = dist;
-                    j = i;
+    unsigned rows_per_thread = height / num_threads;
+    unsigned remaining_rows = height % num_threads;
+
+    std::vector<std::thread> threads;
+
+    auto compute_chunk = [this, num_cells](unsigned start_y, unsigned end_y) {
+        for (unsigned y = start_y; y < end_y; ++y) {
+            for (unsigned x = 0; x < width; ++x) {
+                unsigned dist_min = std::numeric_limits<unsigned>::max();
+                std::size_t j = 0;
+
+                for (std::size_t i = 0; i < num_cells; ++i) {
+                    int diff_x = point_pos[i].x - static_cast<int>(x);
+                    int diff_y = point_pos[i].y - static_cast<int>(y);
+                    unsigned dist = static_cast<unsigned>(diff_x*diff_x + diff_y*diff_y);
+                    if (dist < dist_min) {
+                        dist_min = dist;
+                        j = i;
+                    }
                 }
+                img.setPixel({x, y}, colors[j]);
             }
-            img.setPixel({x, y}, colors[j]);
         }
+    };
+
+    unsigned current_y = 0;
+    for (unsigned t = 0; t < num_threads; ++t) {
+        unsigned extra_row = (t < remaining_rows) ? 1 : 0;
+        unsigned chunk_size = rows_per_thread + extra_row;
+        unsigned start_y = current_y;
+        unsigned end_y = start_y + chunk_size;
+
+        threads.emplace_back(compute_chunk, start_y, end_y);
+        current_y = end_y;
     }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
     texture.update(img);
 }
 
@@ -85,13 +113,11 @@ void Game::run() {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
-
             else if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
                 if (buttonPressed->button == sf::Mouse::Button::Left) {
                     createPoint(buttonPressed->position);
                 }
             }
-
             else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
                 if (keyPressed->scancode == sf::Keyboard::Scancode::Space) {
                     generateVoronoi();
