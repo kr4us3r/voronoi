@@ -9,6 +9,7 @@ Game::Game() : window(sf::VideoMode({width, height}), "voronoi",
                img({width, height}, sf::Color::Black),
                texture(img),
                background(texture) {
+    window.setFramerateLimit(30u);
     // seed the randomizer
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     // generate num_colors random colors
